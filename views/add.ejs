@@ -2,7 +2,8 @@
 <section class="container">
 <h3>Add Story</h3>
 <div class="row">
-   <form action="/routes/entries.js" enctype="multipart/form-data" method="POST" class="col s12">
+    <%# CHANGE BY NOTHINGREMAINS: removed enctype (requires multer to use), changed action to /entries/add %>
+   <form action="/entries/add" method="POST" class="col s12">
         <div class="row">
             <div class="input-field">
                 <input type="text" id="title" name="title">
@@ -29,7 +30,8 @@
         </div>
 
         <div class="row">
-            <button type="submit" class="btn btn-dark add-btn" value="Upload">Submit</button>
+            <%# CHANGE BY NOTHINGREMAINS: changed value from Upload to Submit (multer again) %>
+            <button type="submit" class="btn btn-dark add-btn" value="Submit">Submit</button>
             <a href="/dashboard" class="btn btn-dark add-btn">Cancel</a>
         </div>
     </form>

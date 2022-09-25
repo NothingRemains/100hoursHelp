@@ -1,18 +1,19 @@
 const mongoose = require('mongoose')
 
 //the information that we'll get back about users for their profile from google using google auth for logins.
+// ** CHANGES BY NOTHINGREMAINS: removed required from title/body.  Currently causing errors, need to be fixed and added back in when problem is found. Fixed 'default' typo in status.
 const StorySchema = new mongoose.Schema({
     title: {
         type: String,
-        required: true
+        
     },
     body: {
         type: String,
-        required: true
+    
     },
     status: {
         type: String,
-        defualt: 'public',
+        default: 'public',
         enum: ['public', 'private']
     },
     user: {
@@ -20,7 +21,6 @@ const StorySchema = new mongoose.Schema({
         ref: 'User',//ref back to user model
         required: true,  // to make sure the app pairs every story with a user to keep the app from breaking
     },
-    
     createdAt: {
         type: Date,
         default: Date.now //Default will assign a value if none is provided. So it will assign now as the default if none is provided. 

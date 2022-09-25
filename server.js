@@ -55,10 +55,12 @@ app.use(passport.session());
 app.use(flash());
 
 //Setup Routes For Which The Server Is Listening
+
+// ** CHANGES BY NOTHINGREMAINS HERE ** added /entries for entriesRoutes
 app.use("/", mainRoutes);
-app.post("/", entriesRoutes);
-app.use("/add", entriesRoutes);
+app.use("/entries", entriesRoutes);
 app.use("/comment", commentRoutes);
+
 //app.use('/stories', require('./routes/stories'))
 
 //Server Running
