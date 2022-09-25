@@ -11,6 +11,11 @@ these at the same time from the same location.  Bringing in multiple items at th
 const Story = require('../models/Story') //adding the story model
 
 
+// @desc Proess add form 
+// @route POST/stories
+
+
+
 // @desc Show all stories
 // @route GET /stories/
 router.get('/', ensureAuth, async (req, res) => {  //ensureAuth makes sure they are logged in. //asynch is getting the database // only need the '/' and not /stories becuase of our route in app.js
