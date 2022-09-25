@@ -1,15 +1,30 @@
-const cloudinary = require("../middleware/cloudinary");
-const Post = require("../models/Post");
-const Comments = require("../models/Comments");
 const express = require('express')
 const router = express.Router()
-const { ensureAuth } = require('../middleware/auth')
-
+const { ensureAuth } = require('../middlware/auth')
 /* //destructuring - I want to bring in both of 
 these at the same time from the same location.  Bringing in multiple items at the same time from the same location. */
 
 const Story = require('../models/Story') //adding the story model
 
+// @desc Show add page
+// @route GET /stories/add
+router.get('/add', ensureAuth, (req, res) => {  //ensureAuth makes sure they are logged in
+    res.render('stories/add') //rendering the add stories page
+})
+
+// @desc Proess add form 
+// @route POST/stories
+router.post('/', ensureAuth, async (req, res) => {  //ensureAuth makes sure they are logged in 
+    try {
+        req.body.user = req.user.id // adds the user value to the story
+        await Story.create(req.body) // populates the fields 
+        res.redirect('/dashboard') //once we submit a story, it will send us back to the dashboard.
+
+    } catch (err){
+        console.error(err)
+        res.render('error/500')
+    }
+})
 
 // @desc Show all stories
 // @route GET /stories/
@@ -20,7 +35,7 @@ router.get('/', ensureAuth, async (req, res) => {  //ensureAuth makes sure they 
             .sort({ createdAt: 'desc'}) // ability to sort the cards so they are in order of creation date from newest to oldest. 
             .lean() // lean takes it from a mongoose object and turns it into a plain json object so handlebars can use it. 
 
-            res.render('community.ejs', { 
+            res.render('stories/index', { //rending the stories template and passing in the stories object
                 stories,
             })
     } catch (err) {
@@ -39,10 +54,10 @@ router.get('/:id', ensureAuth, async (req,res) => {
           .lean()
       
       if (!story) {
-          return res.render('/error/404')
+          return res.render('error/404')
           }
       
-      res.render('show.ejs', {
+      res.render('stories/show', {
           story
       })
       } catch (err) {
@@ -55,7 +70,7 @@ router.get('/:id', ensureAuth, async (req,res) => {
 // @route GET /stories/edit/:id
 //using findOne makes sure we find the one and get one result back
 //telling the method here to look inside the route, look inside the request and find the parameter of id.
-router.get('/edit/:_id', ensureAuth, async (req, res) => {
+router.get('/edit/:id', ensureAuth, async (req, res) => {
     try {
       const story = await Story.findOne({
         _id: req.params.id,
@@ -66,9 +81,9 @@ router.get('/edit/:_id', ensureAuth, async (req, res) => {
       }
 
       if (story.user != req.user.id) {
-        res.redirect('/community') // on the off chance that someone tries to edit a story they don't own, they'll get redirected. It's double insurance because theoretically it shouldn't happen. 
+        res.redirect('/stories') // on the off chance that someone tries to edit a story they don't own, they'll get redirected. It's double insurance because theoretically it shouldn't happen. 
     } else {
-        res.render('edit/:_id', {
+        res.render('stories/edit', {
           story,
         })
       }
@@ -83,7 +98,7 @@ router.get('/edit/:_id', ensureAuth, async (req, res) => {
 
 // @desc Update Story
 // @route PUT /stories/:id
-router.put('/:_id', ensureAuth, async (req, res) => {  
+router.put('/:id', ensureAuth, async (req, res) => {  
   try {
   let story = await Story.findById(req.params.id).lean() // Mongoose method to check for ids. 
 
@@ -92,7 +107,7 @@ router.put('/:_id', ensureAuth, async (req, res) => {
   }
   // Check Owner of the Story - should be logged in user's ID. If not it will redirect. 
   if (story.user != req.user.id) {
-    res.redirect('/community') 
+    res.redirect('/stories') 
 } else { // If it passess the checks, we're using another mongoose method to find the one story and to perform an update operation on it. 
       story = await Story.findOneAndUpdate({_id: req.params.id}, req.body, { //Finding the story by the id and replacing the content of the body with the request.
         new: true,  // For some reason if we try to update a story that doesn't exist it will create a new one.
@@ -132,7 +147,7 @@ router.get('/user/:userId', ensureAuth, async (req, res) => {
       .populate('user')
       .lean()
     // Using the index page we already built and passing in different information
-    res.render('community', {
+    res.render('stories/index', {
       stories,
     })
   } catch (err) {
@@ -142,89 +157,4 @@ router.get('/user/:userId', ensureAuth, async (req, res) => {
 })
 
 
-module.exports = {
-  getDashboard: async (req, res) => {
-    try {
-    // Explanation for below lines
-    // Post is from the model - use the post model, look in the post collection, find the user by id. 
-      const stories = await Post.find({ user: req.user.id });
-      // Show that user's data on the profile.ejs page. It will pass their posts and user information through. 
-      res.render("dashboard.ejs", { stories: stories, user: req.user });
-    } catch (err) {
-      console.log(err);
-    }
-  },
-  getCommunity: async (req, res) => {
-    try {
-      // Explanation for below lines
-      // .lean is just mongoose
-      // Post is from our model, telling it to find posts and sort them by the createdAt desc from the database
-      const stories = await Post.find().sort({ createdAt: "desc" }).lean();
-      // res.render is just show the feed.ejs view/page and to show the posts stored in our database. 
-      res.render("community.ejs", { stories: stories });
-    } catch (err) {
-      console.log(err);
-    }
-  },
-  getAddPage: async (req, res) => {
-    try {
-      res.render("add.ejs");
-    } catch (err){
-      console.log(err);
-    }
-  },
-  getStory: async (req, res) => {
-    try {
-      const story = await Story.findById(req.params.id);
-      const comments = await Comments.find({post: req.params.id}).sort({ createdAt: "asc" }).lean();
-      res.render("community.ejs", { story: story, user: req.user });
-    } catch (err) {
-      console.log(err);
-    }
-  },
-// @desc Proess add form 
-// @route POST/stories
-  createStory: async (req, res) => {
-    try {
-        await Story.create({
-          title: req.body.title,
-          body: req.params.body,
-          user: req.user.id,
-        });
-      res.redirect('/dashboard') //once we submit a story, it will send us back to the dashboard.
-      console.log("Post has been added!");
-    } catch (err) {
-      console.error(err)
-      res.render('error/500')
-  }},
-  likePost: async (req, res) => {
-    try {
-      await Post.findOneAndUpdate(
-        { _id: req.params.id },
-        {
-          $inc: { likes: 1 },
-        }
-      );
-      console.log("Likes +1");
-      res.redirect(`/post/${req.params.id}`);
-    } catch (err) {
-      console.log(err);
-    }
-  },
-  deletePost: async (req, res) => {
-    try {
-      // Find post by id
-      let post = await Post.findById({ _id: req.params.id });
-      // Delete image from cloudinary
-      await cloudinary.uploader.destroy(post.cloudinaryId);
-      // Delete post from db
-      await Post.remove({ _id: req.params.id });
-      console.log("Deleted Post");
-      // Render (or show) the profile page
-      res.redirect("/dashboard");
-    } catch (err) {
-      // if there is an error for some reason, it will still render the profile page. 
-      res.redirect("/dashboard");
-    }
-  },
-};
+module.exports = router

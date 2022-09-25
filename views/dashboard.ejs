@@ -1,0 +1,38 @@
+<%- include('partials/header') -%>
+
+<h6>DASHBOARD</h6>
+<h3>Welcome <%= user.userName %></p></h3>
+<p>Here are your stories</p>
+<!--If stories add here -->
+    <table class="striped">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+          <!--If stories add here -->
+                <tr>
+                <td><a href="community/:_id"><!-- add title ejs here -->Title</a></td>
+                <td><!-- add Date ejs here -->Date</td>
+                <td><span class="class dash-status"><!-- add Status ejs here -->Status</span></td>
+                <td>
+                    <a href="/edit/:_id" class="btn btn-float">
+                   <i class="fas fa-edit"></i> <!-- add edit link ejs here -->
+                    </a>
+                    <form action="community/:_id" method="POST" id="delete-form">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <button type="submit" class="btn red">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+
+<%- include('partials/footer') -%>
