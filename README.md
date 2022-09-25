@@ -1,6 +1,5 @@
-# Share It App
-Share It App is a social media web application that works similar to Instagram. Users can create logins and login (using Passport, Sessions and BCRYPT), upload photos (Cloudinary), and post to a public feed.  Users can like and comment on public posts and delete their own posts.
-
+# TBD
+S
 # Tech Used
 This app was created using Javascript, EJS, Bootstrap, Node.js, Express.js, Passport, and BCRPYT. 
 
