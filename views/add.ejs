@@ -1,4 +1,5 @@
 <%- include('partials/header') -%>
+<section class="container">
 <h3>Add Story</h3>
 <div class="row">
    <form action="/routes/entries.js" enctype="multipart/form-data" method="POST" class="col s12">
@@ -11,10 +12,11 @@
 
         <div class="row">
             <div class="input-field">
-                <select id="status" name="status">
-                    <option value="public" selected>Public</option>
+                 <select id="status" name="status">
+                   <option value="public" selected>Public</option>
                     <option value="private">Private</option>
                 </select>
+                
                 <label for="status">Status</label>
             </div>
         </div>
@@ -27,9 +29,10 @@
         </div>
 
         <div class="row">
-            <button type="submit" class="btn btn-dark" value="Upload">Submit</button>
-            <a href="/dashboard" class="btn">Cancel</a>
+            <button type="submit" class="btn btn-dark add-btn" value="Upload">Submit</button>
+            <a href="/dashboard" class="btn btn-dark add-btn">Cancel</a>
         </div>
     </form>
 </div>
+</section>
 <%- include('partials/footer') -%>
